@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Snake Game (Flask)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Snake Game (Flask)</h1>
+  <div id="py-controls" style="margin-bottom:1rem;">
+    <button id="startPygame">Start Pygame (opens local window)</button>
+    <button id="stopPygame">Stop Pygame</button>
+    <span id="pyStatus" style="margin-left:1rem">Status: unknown</span>
+  </div>
+  <div id="ui-controls" style="text-align:center; margin-bottom:0.5rem;">
+    <button id="startGame">Start Game (begin movement)</button>
+  </div>
+  <div id="game">
+    <canvas id="gameCanvas" width="900" height="800"></canvas>
+    <div id="score">Score: 0</div>
+  </div>
+  <div id="overlay" class="hidden">
+    <div id="overlay-content">
+      <h2 id="msg">Game Over</h2>
+      <button id="restart">Play Again</button>
+    </div>
+  </div>
+  <script>
+    async function updateStatus(){
+      try{
+        const r = await fetch('/game_status');
+        const j = await r.json();
+        document.getElementById('pyStatus').textContent = 'Status: ' + j.status;
+      }catch(e){
+        document.getElementById('pyStatus').textContent = 'Status: error';
+      }
+    }
+    document.getElementById('startPygame').addEventListener('click', async ()=>{
+      await fetch('/start_pygame', {method: 'POST'});
+      await updateStatus();
+    });
+    document.getElementById('stopPygame').addEventListener('click', async ()=>{
+      await fetch('/stop_pygame', {method: 'POST'});
+      await updateStatus();
+    });
+    updateStatus();
+  </script>
+  <script src="{{ url_for('static', filename='snake.js') }}"></script>
+</body>
+</html>
